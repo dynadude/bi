@@ -191,8 +191,6 @@ def main() -> None:
                     'Specified context file does not contain non-empty lines. Aborting...')
                 return
 
-            print(f"context: {context}")
-
             # Create the user bi dir if it does not exist, but abort if it exists but isn't a directory (most likely a regular file)
             if not os.path.isdir(USER_BI_DIR):
                 if os.path.exists(USER_BI_DIR):
