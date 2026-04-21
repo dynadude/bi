@@ -107,7 +107,8 @@ def get_context(path: str = CONTEXT_FILE_PATH) -> list[str]:
 
 
 def get_log(path: str = LOG_FILE_PATH) -> list[tuple[str, int]]:
-    log_lines = list(filter(lambda x: not x.startswith('#'), get_raw_log()))
+    log_lines = list(
+        filter(lambda x: not x.startswith('#'), get_raw_log(path)))
     log_operations: list[tuple[str, int]] = []
     for line in log_lines:
         words = line.strip().split()
