@@ -154,6 +154,11 @@ def is_empty(dir: str) -> bool:
     return True
 
 
+def does_user_consent(prompt: str) -> bool:
+    answer = input(prompt)
+    return answer.lower() == 'y'
+
+
 def verify_marked_lines_are_valid(log: list[tuple[str, int]] | None = None) -> None:
     if log is None:
         log = get_log()
