@@ -103,7 +103,7 @@ def reset_command() -> None:
 def visualize_command() -> None:
     context = get_context()
     filtered_context_indices = get_filtered_context_indices()
-    current_line_index = get_current_line_index()
+    current_line_index = get_current_line_index(filtered_context_indices)
     filtered_context_lines: list[str] = []
 
     context[current_line_index] += ' (HEAD)'
