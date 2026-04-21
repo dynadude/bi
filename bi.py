@@ -239,7 +239,7 @@ def recreate_dir(path: str) -> None:
 def get_current_line_index(filtered_context_indices: list[int] | None = None) -> int:
     if filtered_context_indices is None:
         # typical initial content: [0, 1, 2, 3, ...]
-        filtered_context_indices = get_filtered_context_indices(get_log())
+        filtered_context_indices = get_filtered_context_indices()
 
     # TODO: take skipped lines into account (raise new type of exception)
     current_line_index_filtered_index = math.floor(
