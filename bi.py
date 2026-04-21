@@ -328,6 +328,18 @@ def get_context_line(index: int) -> str:
     return get_context()[index]
 
 
+def get_operation_type_at_index(index: int) -> str | None:
+    log = get_log()
+    for operation in log:
+        operation_type = operation[0]
+        context_line_index = operation[1]
+
+        if context_line_index == index:
+            return operation_type
+
+    return None
+
+
 def main() -> None:
     script_args = sys.argv
 
