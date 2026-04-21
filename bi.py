@@ -31,13 +31,6 @@ def help_command() -> None:
     )
 
 
-def is_empty(dir: str) -> bool:
-    for _ in os.scandir(dir):
-        return False
-
-    return True
-
-
 def start_command(script_args: list[str]) -> None:
     original_context_file = script_args[2]
     # remove empty lines
@@ -144,6 +137,13 @@ def replay_command(script_args: list[str]) -> None:
 
 def log_command() -> None:
     print(os.linesep.join(get_raw_log()))
+
+
+def is_empty(dir: str) -> bool:
+    for _ in os.scandir(dir):
+        return False
+
+    return True
 
 
 def verify_marked_lines_are_valid(log: list[tuple[str, int]] | None = None) -> None:
