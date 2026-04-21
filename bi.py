@@ -90,6 +90,10 @@ def reset_command() -> None:
         print(f"Nothing to do as {USER_BI_DIR} does not exist yet")
 
 
+def log_command() -> None:
+    print(os.linesep.join(get_raw_log()))
+
+
 def get_context(path: str = CONTEXT_FILE_PATH) -> list[str]:
     return list(filter(None, get_lines_in_file(path)))
 
@@ -253,7 +257,7 @@ def main() -> None:
         case 'replay':
             pass
         case 'log':
-            pass
+            log_command()
         case 'help' | _:
             print_help_text()
 
