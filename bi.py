@@ -53,6 +53,8 @@ def start_command(script_args: list[str]) -> None:
 
 
 def status_command() -> None:
+    verify_marked_lines_are_valid()
+
     print_current_line_message()
 
 
@@ -66,6 +68,8 @@ def mark_line_command(script_args: list[str]) -> None:
 
     current_line = get_context_line(marked_line_index)
     write_operation_to_log(operation, marked_line_index)
+    verify_marked_lines_are_valid()
+
     print(
         f"Line '{current_line}' of index {marked_line_index} has been marked as {operation}")
 
@@ -95,6 +99,8 @@ def replay_command(script_args: list[str]) -> None:
     original_log_file = script_args[2]
     raw_log = get_raw_log(original_log_file)
 
+    verify_marked_lines_are_valid(get_log(original_log_file))
+
     write_lines_to_file(LOG_FILE_PATH, raw_log)
 
     print(f"Successfully replayed from file {original_log_file}")
@@ -104,6 +110,41 @@ def replay_command(script_args: list[str]) -> None:
 
 def log_command() -> None:
     print(os.linesep.join(get_raw_log()))
+
+
+def verify_marked_lines_are_valid(log: list[tuple[str, int]] | None = None) -> None:
+    if log is None:
+        log = get_log()
+
+    context = get_context()
+    # typical content: [0, 1, 2, 3, ...]
+    context_indices: list[int] = list(range(len(context)))
+
+    existing_markings: dict[int, str] = dict()
+    for operation in log:
+        operation_type = operation[0]
+        context_line_index = operation[1]
+
+        # Verify that the operation type is valid
+        match operation_type:
+            case 'good' | 'old' | 'bad' | 'new' | 'skip':
+                pass
+            case _:
+                raise InvalidOperationTypeError(
+                    f"Operation type '{operation_type}' is invalid")
+
+        # Verify that all marked lines correspond to real lines in the context
+        if context_line_index not in context_indices:
+            raise FileNotFoundError(
+                f"Context does not contain line of index {context_line_index}")
+
+        # Verify that there are no conflicting markings for the same line
+        if context_line_index in existing_markings and not are_operation_types_equivalent(operation_type, existing_markings[context_line_index]):
+            context_line = get_context_line(context_line_index)
+            raise FileExistsError(
+                f"Line '{context_line}' of index {context_line_index} has been marked as both {existing_markings[context_line_index]} and {operation_type}")
+
+        existing_markings[context_line_index] = operation_type
 
 
 def are_operation_types_equivalent(first_type: str, second_type: str) -> bool:
