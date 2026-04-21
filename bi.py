@@ -296,7 +296,7 @@ def remove_after(lst: list[T], element: T) -> None:
 
 def print_current_line_message(filtered_context_indices: list[int] | None = None) -> None:
     if filtered_context_indices is None:
-        # typical initial content: [0, 1, 2, 3, ...]
+        # typical content: [0, 1, 2, 3, ...]
         filtered_context_indices = get_filtered_context_indices(get_log())
 
     current_line_index = get_current_line_index(
