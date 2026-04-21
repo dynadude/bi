@@ -42,13 +42,14 @@ def start_command(script_args: list[str]) -> bool:
         return False
 
     # Includes prompting the user if the bi dir is not empty
-    reset_command()
+    if reset_command():
+        write_lines_to_file(CONTEXT_FILE_PATH, context)
+        write_lines_to_file(LOG_FILE_PATH, [])
 
-    write_lines_to_file(CONTEXT_FILE_PATH, context)
-    write_lines_to_file(LOG_FILE_PATH, [])
-
-    print_current_line_message()
-    return True
+        print_current_line_message()
+        return True
+    else:
+        return False
 
 
 def status_command() -> bool:
@@ -94,9 +95,12 @@ def reset_command() -> bool:
 
     # Prompt the user to make sure they approve of overwriting the previous contents of their user bi dir if it isn't empty
     if not is_empty(USER_BI_DIR):
-        # TODO: prompt user about overwriting the directory
-        print('dir is NOT empty!!!!!')
-        recreate_dir(USER_BI_DIR)
+        if does_user_consent(f"The {USER_BI_DIR} dir is not empty. are you sure you would like to recreate it? (y/N): "):
+            recreate_dir(USER_BI_DIR)
+        else:
+            print(
+                f"Did not get user consent for recreating the {USER_BI_DIR} dir. Aborting...")
+            return False
 
     print(f"Successfully recreated {USER_BI_DIR}")
     return True
