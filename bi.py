@@ -254,8 +254,6 @@ def main() -> None:
             pass
         case 'log':
             pass
-        case 'next':
-            pass
         case 'help' | _:
             print_help_text()
 
