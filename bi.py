@@ -15,6 +15,10 @@ CONTEXT_FILE_PATH = os.path.join(USER_BI_DIR, 'context')
 LOG_FILE_PATH = os.path.join(USER_BI_DIR, 'log')
 
 
+class InvalidOperationTypeError(Exception):
+    pass
+
+
 def print_help_text() -> None:
     print(
         '''The bi python script performs a git-bisect-like operation on the contents of a text file, treating each line as a 'revision' to test.
