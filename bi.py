@@ -96,14 +96,14 @@ def reset_command() -> None:
 
 
 def replay_command(script_args: list[str]) -> None:
-    original_log_file = script_args[2]
-    raw_log = get_raw_log(original_log_file)
+    supplied_log_file = script_args[2]
+    raw_log = get_raw_log(supplied_log_file)
 
-    verify_marked_lines_are_valid(get_log(original_log_file))
+    verify_marked_lines_are_valid(get_log(supplied_log_file))
 
     write_lines_to_file(LOG_FILE_PATH, raw_log)
 
-    print(f"Successfully replayed from file {original_log_file}")
+    print(f"Successfully replayed from file {supplied_log_file}")
 
     print_current_line_message()
 
