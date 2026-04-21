@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-import tempfile
-import os
-import sys
-import math
 import getpass
-import shutil
+import math
+import os
 import pydoc
+import shutil
+import sys
+import tempfile
 from typing import TypeVar
 T = TypeVar('T')
 
