@@ -39,20 +39,8 @@ def start_command(script_args: list[str]) -> None:
             'Specified context file does not contain non-empty lines. Aborting...')
         return
 
-    # Create the user bi dir if it does not exist, but abort if it exists but isn't a directory (most likely a regular file)
-    if not os.path.isdir(USER_BI_DIR):
-        if os.path.exists(USER_BI_DIR):
-            print(
-                f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
-            return
-
-        os.mkdir(USER_BI_DIR)
-
-    # Prompt the user to make sure they approve of overwriting the previous contents of their user bi dir if it isn't empty
-    if not is_empty(USER_BI_DIR):
-        # TODO: prompt user about overwriting the directory
-        print('dir is NOT empty!!!!!')
-        recreate_dir(USER_BI_DIR)
+    # Includes prompting the user if the bi dir is not empty
+    reset_command()
 
     write_lines_to_file(CONTEXT_FILE_PATH, context)
     write_lines_to_file(LOG_FILE_PATH, [])
@@ -81,15 +69,22 @@ def mark_line_command(script_args: list[str]) -> None:
 
 
 def reset_command() -> None:
-    if os.path.isdir(USER_BI_DIR):
+    # Create the user bi dir if it does not exist, but abort if it exists but isn't a directory (most likely a regular file)
+    if not os.path.isdir(USER_BI_DIR):
+        if os.path.exists(USER_BI_DIR):
+            print(
+                f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
+            return
+
+        os.mkdir(USER_BI_DIR)
+
+    # Prompt the user to make sure they approve of overwriting the previous contents of their user bi dir if it isn't empty
+    if not is_empty(USER_BI_DIR):
+        # TODO: prompt user about overwriting the directory
+        print('dir is NOT empty!!!!!')
         recreate_dir(USER_BI_DIR)
-        print(f"Successfully recreated {USER_BI_DIR}")
-    elif os.path.exists(USER_BI_DIR):
-        print(
-            f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
-        return
-    else:
-        print(f"Nothing to do as {USER_BI_DIR} does not exist yet")
+
+    print(f"Successfully recreated {USER_BI_DIR}")
 
 
 def replay_command(script_args: list[str]) -> None:
