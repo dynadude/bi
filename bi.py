@@ -57,6 +57,8 @@ def start_command(script_args: list[str]) -> None:
     write_lines_to_file(CONTEXT_FILE_PATH, context)
     write_lines_to_file(LOG_FILE_PATH, [])
 
+    print_current_line_message()
+
 
 def status_command() -> None:
     print_current_line_message()
