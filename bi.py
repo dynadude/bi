@@ -90,6 +90,17 @@ def reset_command() -> None:
         print(f"Nothing to do as {USER_BI_DIR} does not exist yet")
 
 
+def replay_command(script_args: list[str]) -> None:
+    original_log_file = script_args[2]
+    raw_log = get_raw_log(original_log_file)
+
+    write_lines_to_file(LOG_FILE_PATH, raw_log)
+
+    print(f"Successfully replayed from file {original_log_file}")
+
+    print_current_line_message()
+
+
 def log_command() -> None:
     print(os.linesep.join(get_raw_log()))
 
@@ -255,7 +266,7 @@ def main() -> None:
         case 'visualize' | 'view':
             pass
         case 'replay':
-            pass
+            replay_command(script_args)
         case 'log':
             log_command()
         case 'help' | _:
