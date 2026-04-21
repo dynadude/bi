@@ -29,6 +29,69 @@ def is_empty(dir: str) -> bool:
     return True
 
 
+def start_command(script_args: list[str]) -> None:
+    original_context_file = script_args[2]
+    # remove empty lines
+    context = get_context(original_context_file)
+
+    if len(context) < 1:
+        print(
+            'Specified context file does not contain non-empty lines. Aborting...')
+        return
+
+    # Create the user bi dir if it does not exist, but abort if it exists but isn't a directory (most likely a regular file)
+    if not os.path.isdir(USER_BI_DIR):
+        if os.path.exists(USER_BI_DIR):
+            print(
+                f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
+            return
+
+        os.mkdir(USER_BI_DIR)
+
+    # Prompt the user to make sure they approve of overwriting the previous contents of their user bi dir if it isn't empty
+    if not is_empty(USER_BI_DIR):
+        # TODO: prompt user about overwriting the directory
+        print('dir is NOT empty!!!!!')
+        recreate_dir(USER_BI_DIR)
+
+    write_lines_to_file(CONTEXT_FILE_PATH, context)
+    write_lines_to_file(LOG_FILE_PATH, [])
+
+
+def status_command() -> None:
+    # TODO: notify and exit when there's only a bad/good line
+    print_current_line_message()
+
+
+def mark_line_command(script_args: list[str]) -> None:
+    operation = script_args[1]
+    # TODO: do not print status when there's only a bad/good line or there aren't any
+    marked_line_index = None
+    if len(script_args) > 2:
+        marked_line_index = get_context_line_index(script_args[2])
+    else:
+        marked_line_index = get_current_line_index()
+
+    current_line = get_context_line(marked_line_index)
+    write_operation_to_log(operation, marked_line_index)
+    print(
+        f"Line '{current_line}' of index {marked_line_index} has been marked as {operation}")
+
+    print_current_line_message()
+
+
+def reset_command() -> None:
+    if os.path.isdir(USER_BI_DIR):
+        recreate_dir(USER_BI_DIR)
+        print(f"Successfully recreated {USER_BI_DIR}")
+    elif os.path.exists(USER_BI_DIR):
+        print(
+            f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
+        return
+    else:
+        print(f"Nothing to do as {USER_BI_DIR} does not exist yet")
+
+
 def get_context(path: str = CONTEXT_FILE_PATH) -> list[str]:
     return list(filter(None, get_lines_in_file(path)))
 
@@ -182,60 +245,13 @@ def main() -> None:
     operation = script_args[1]
     match operation:
         case 'start':
-            original_context_file = script_args[2]
-            # remove empty lines
-            context = get_context(original_context_file)
-
-            if len(context) < 1:
-                print(
-                    'Specified context file does not contain non-empty lines. Aborting...')
-                return
-
-            # Create the user bi dir if it does not exist, but abort if it exists but isn't a directory (most likely a regular file)
-            if not os.path.isdir(USER_BI_DIR):
-                if os.path.exists(USER_BI_DIR):
-                    print(
-                        f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
-                    return
-
-                os.mkdir(USER_BI_DIR)
-
-            # Prompt the user to make sure they approve of overwriting the previous contents of their user bi dir if it isn't empty
-            if not is_empty(USER_BI_DIR):
-                # TODO: prompt user about overwriting the directory
-                print('dir is NOT empty!!!!!')
-                recreate_dir(USER_BI_DIR)
-
-            write_lines_to_file(CONTEXT_FILE_PATH, context)
-            write_lines_to_file(LOG_FILE_PATH, [])
+            start_command(script_args)
         case 'status':
-            # TODO: notify and exit when there's only a bad/good line
-            print_current_line_message()
+            status_command()
         case 'good' | 'old' | 'bad' | 'new' | 'skip':
-            # TODO: do not print status when there's only a bad/good line or there aren't any
-            marked_line_index = None
-            if len(script_args) > 2:
-                marked_line_index = get_context_line_index(script_args[2])
-            else:
-                marked_line_index = get_current_line_index()
-
-            current_line = get_context_line(marked_line_index)
-            write_operation_to_log(operation, marked_line_index)
-            print(
-                f"Line '{current_line}' of index {marked_line_index} has been marked as {operation}")
-
-            print_current_line_message()
+            mark_line_command(script_args)
         case 'reset':
-            if os.path.isdir(USER_BI_DIR):
-                recreate_dir(USER_BI_DIR)
-                print(f"Successfully recreated {USER_BI_DIR}")
-            elif os.path.exists(USER_BI_DIR):
-                print(
-                    f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
-                return
-            else:
-                print(f"Nothing to do as {USER_BI_DIR} does not exist yet")
-
+            reset_command()
         case 'visualize' | 'view':
             pass
         case 'replay':
