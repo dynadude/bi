@@ -20,6 +20,10 @@ class InvalidOperationTypeError(Exception):
     pass
 
 
+class FirstLineOldError(Exception):
+    pass
+
+
 def print_help_text() -> None:
     print(
         '''The bi python script performs a git-bisect-like operation on the contents of a text file, treating each line as a 'revision' to test.
