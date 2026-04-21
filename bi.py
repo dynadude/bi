@@ -31,7 +31,7 @@ def help_command() -> None:
     )
 
 
-def start_command(script_args: list[str]) -> None:
+def start_command(script_args: list[str]) -> bool:
     original_context_file = script_args[2]
     # remove empty lines
     context = get_context(original_context_file)
@@ -39,7 +39,7 @@ def start_command(script_args: list[str]) -> None:
     if len(context) < 1:
         print(
             'Specified context file does not contain non-empty lines. Aborting...')
-        return
+        return False
 
     # Includes prompting the user if the bi dir is not empty
     reset_command()
@@ -48,15 +48,17 @@ def start_command(script_args: list[str]) -> None:
     write_lines_to_file(LOG_FILE_PATH, [])
 
     print_current_line_message()
+    return True
 
 
-def status_command() -> None:
+def status_command() -> bool:
     verify_marked_lines_are_valid()
 
     print_current_line_message()
+    return True
 
 
-def mark_line_command(script_args: list[str]) -> None:
+def mark_line_command(script_args: list[str]) -> bool:
     operation = script_args[1]
     marked_line_index = None
     if len(script_args) > 2:
@@ -77,15 +79,16 @@ def mark_line_command(script_args: list[str]) -> None:
         f"Line '{current_line}' of index {marked_line_index} has been marked as {operation}")
 
     print_current_line_message()
+    return True
 
 
-def reset_command() -> None:
+def reset_command() -> bool:
     # Create the user bi dir if it does not exist, but abort if it exists but isn't a directory (most likely a regular file)
     if not os.path.isdir(USER_BI_DIR):
         if os.path.exists(USER_BI_DIR):
             print(
                 f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
-            return
+            return False
 
         os.mkdir(USER_BI_DIR)
 
@@ -96,15 +99,16 @@ def reset_command() -> None:
         recreate_dir(USER_BI_DIR)
 
     print(f"Successfully recreated {USER_BI_DIR}")
+    return True
 
 
-def visualize_command() -> None:
+def visualize_command() -> bool:
     try:
         filtered_context_indices = get_filtered_context_indices()
     except FirstLineOldError:
         print(
             f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
-        return
+        return False
 
     context = get_context()
     current_line_index = get_current_line_index(filtered_context_indices)
@@ -121,8 +125,10 @@ def visualize_command() -> None:
     else:
         print(joined_string)
 
+    return True
 
-def replay_command(script_args: list[str]) -> None:
+
+def replay_command(script_args: list[str]) -> bool:
     supplied_log_file = script_args[2]
     raw_log = get_raw_log(supplied_log_file)
 
@@ -133,10 +139,12 @@ def replay_command(script_args: list[str]) -> None:
     print(f"Successfully replayed from file {supplied_log_file}")
 
     print_current_line_message()
+    return True
 
 
-def log_command() -> None:
+def log_command() -> bool:
     print(os.linesep.join(get_raw_log()))
+    return True
 
 
 def is_empty(dir: str) -> bool:
