@@ -134,8 +134,7 @@ def write_operation_to_log(operation: str, context_line_index: int) -> None:
 
 def write_lines_to_file(path: str, lines: list[str]) -> None:
     with open(path, 'w') as f:
-        # TODO: platform-agnostic line-breaks
-        f.writelines(map(lambda s: s + '\n', lines))
+        f.writelines(map(lambda s: s + os.linesep, lines))
 
 
 def recreate_dir(path: str) -> None:
