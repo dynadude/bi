@@ -6,6 +6,7 @@ import sys
 import math
 import getpass
 import shutil
+import pydoc
 from typing import TypeVar
 T = TypeVar('T')
 
@@ -93,6 +94,24 @@ def reset_command() -> None:
         recreate_dir(USER_BI_DIR)
 
     print(f"Successfully recreated {USER_BI_DIR}")
+
+
+def visualize_command() -> None:
+    context = get_context()
+    filtered_context_indices = get_filtered_context_indices()
+    current_line_index = get_current_line_index()
+    filtered_context_lines: list[str] = []
+
+    context[current_line_index] += ' (HEAD)'
+    for index in filtered_context_indices:
+        filtered_context_lines.append(context[index])
+
+    joined_string = os.linesep.join(filtered_context_lines)
+    # The + 1 is there so that the previous terminal line would need to be visible to avoid paging
+    if shutil.get_terminal_size().lines <= len(filtered_context_lines) + 1:
+        pydoc.pager(joined_string)
+    else:
+        print(joined_string)
 
 
 def replay_command(script_args: list[str]) -> None:
@@ -323,7 +342,7 @@ def main() -> None:
         case 'reset':
             reset_command()
         case 'visualize' | 'view':
-            pass
+            visualize_command()
         case 'replay':
             replay_command(script_args)
         case 'log':
