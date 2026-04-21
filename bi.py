@@ -333,6 +333,17 @@ def main() -> None:
 
     operation = script_args[1]
     match operation:
+        case 'start' | 'reset' | 'help':
+            pass
+        case _:
+            if not os.path.isdir(USER_BI_DIR) or \
+               not os.path.isfile(CONTEXT_FILE_PATH) or \
+               not os.path.isfile(LOG_FILE_PATH):
+                print(
+                    "Bi hasn't been started. Please run 'bi start file_path' or run 'bi help' for directions")
+                return
+
+    match operation:
         case 'start':
             start_command(script_args)
         case 'status':
