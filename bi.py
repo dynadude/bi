@@ -106,6 +106,21 @@ def log_command() -> None:
     print(os.linesep.join(get_raw_log()))
 
 
+def are_operation_types_equivalent(first_type: str, second_type: str) -> bool:
+    if first_type == second_type:
+        return True
+
+    if first_type == 'good' and second_type == 'old' or \
+       first_type == 'old' and second_type == 'good':
+        return True
+
+    if first_type == 'bad' and second_type == 'new' or \
+       first_type == 'new' and second_type == 'bad':
+        return True
+
+    return False
+
+
 def get_context(path: str = CONTEXT_FILE_PATH) -> list[str]:
     return list(filter(None, get_lines_in_file(path)))
 
