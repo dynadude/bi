@@ -148,9 +148,6 @@ def get_current_line_index(filtered_context_indices: list[int] | None = None) ->
         # typical initial content: [0, 1, 2, 3, ...]
         filtered_context_indices = get_filtered_context_indices(get_log())
 
-    # TODO: remove print
-    print(len(filtered_context_indices))
-
     # TODO: take skipped lines into account (raise new type of exception)
     current_line_index_filtered_index = math.floor(
         (len(filtered_context_indices)) / 2)
@@ -217,6 +214,9 @@ def print_current_line_message(filtered_context_indices: list[int] | None = None
             f"Line '{current_line}' of index {marked_line_index} is the first bad/new line!")
         return
 
+    approximate_step_count = math.ceil(
+        math.log(len(filtered_context_indices), 2))
+    print(f"{len(filtered_context_indices)} lines left to test after this (roughly {approximate_step_count} steps)")
     print(
         f"Currently on line '{current_line}' of index {marked_line_index}")
 
