@@ -155,7 +155,7 @@ def get_filtered_context_indices(log: list[tuple[str, int]] | None = None) -> li
     if log is None:
         log = get_log()
 
-    # TODO: bound check for first line being old or last line being new
+    # TODO: bound check for first line being old
     full_context = get_context()
     # typical initial content: [0, 1, 2, 3, ...]
     filtered_context_indices: list[int] = list(range(len(full_context)))
