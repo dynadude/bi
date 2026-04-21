@@ -24,7 +24,7 @@ class FirstLineOldError(Exception):
     pass
 
 
-def print_help_text() -> None:
+def help_command() -> None:
     print(
         '''The bi python script performs a git-bisect-like operation on the contents of a text file, treating each line as a 'revision' to test.
 '''
@@ -366,7 +366,7 @@ def main() -> None:
 
     # the first value in the list is the script itself
     if len(script_args) <= 1:
-        print_help_text()
+        help_command()
 
     operation = script_args[1]
     match operation:
@@ -396,7 +396,7 @@ def main() -> None:
         case 'log':
             log_command()
         case 'help' | _:
-            print_help_text()
+            help_command()
 
 
 if __name__ == '__main__':
