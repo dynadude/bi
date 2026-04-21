@@ -352,7 +352,7 @@ def main() -> None:
             mark_line_command(script_args)
         case 'reset':
             reset_command()
-        case 'visualize' | 'view':
+        case 'visualize' | 'visualise' | 'view':
             visualize_command()
         case 'replay':
             replay_command(script_args)
