@@ -226,7 +226,16 @@ def main() -> None:
 
             print_current_line_message()
         case 'reset':
-            pass
+            if os.path.isdir(USER_BI_DIR):
+                recreate_dir(USER_BI_DIR)
+                print(f"Successfully recreated {USER_BI_DIR}")
+            elif os.path.exists(USER_BI_DIR):
+                print(
+                    f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
+                return
+            else:
+                print(f"Nothing to do as {USER_BI_DIR} does not exist yet")
+
         case 'visualize' | 'view':
             pass
         case 'replay':
