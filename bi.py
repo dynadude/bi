@@ -69,7 +69,12 @@ def mark_line_command(script_args: list[str]) -> None:
     if len(script_args) > 2:
         marked_line_index = get_context_line_index(script_args[2])
     else:
-        marked_line_index = get_current_line_index()
+        try:
+            marked_line_index = get_current_line_index()
+        except FirstLineOldError:
+            print(
+                f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
+            return False
 
     current_line = get_context_line(marked_line_index)
     write_operation_to_log(operation, marked_line_index)
@@ -101,8 +106,14 @@ def reset_command() -> None:
 
 
 def visualize_command() -> None:
+    try:
+        filtered_context_indices = get_filtered_context_indices()
+    except FirstLineOldError:
+        print(
+            f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
+        return
+
     context = get_context()
-    filtered_context_indices = get_filtered_context_indices()
     current_line_index = get_current_line_index(filtered_context_indices)
     filtered_context_lines: list[str] = []
 
@@ -251,7 +262,6 @@ def get_filtered_context_indices(log: list[tuple[str, int]] | None = None) -> li
     if log is None:
         log = get_log()
 
-    # TODO: bound check for first line being old
     full_context = get_context()
     # typical initial content: [0, 1, 2, 3, ...]
     filtered_context_indices: list[int] = list(range(len(full_context)))
@@ -268,6 +278,8 @@ def get_filtered_context_indices(log: list[tuple[str, int]] | None = None) -> li
                 # Only remove lines BEFORE new lines, not the new line itself
                 remove_before(filtered_context_indices, context_line_index)
             case 'good' | 'old':
+                if context_line_index == 0:
+                    raise FirstLineOldError()
                 remove_after(filtered_context_indices, context_line_index)
                 filtered_context_indices.pop(-1)
             case _:
@@ -297,15 +309,24 @@ def remove_after(lst: list[T], element: T) -> None:
 def print_current_line_message(filtered_context_indices: list[int] | None = None) -> None:
     if filtered_context_indices is None:
         # typical content: [0, 1, 2, 3, ...]
-        filtered_context_indices = get_filtered_context_indices(get_log())
+        try:
+            filtered_context_indices = get_filtered_context_indices(get_log())
+        except FirstLineOldError:
+            print(
+                f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
+            return
 
     current_line_index = get_current_line_index(
         filtered_context_indices)
+
     current_line = get_context_line(current_line_index)
     if len(filtered_context_indices) == 1:
-        print(
-            f"Line '{current_line}' of index {current_line_index} is the first bad/new line!")
-        return
+        operation_type = get_operation_type_at_index(current_line_index)
+        # The current line would not be marked by this point only if it was the first line in the context
+        if operation_type == 'new' or operation_type == 'bad':
+            print(
+                f"Line '{current_line}' of index {current_line_index} is the first bad/new line!")
+            return
 
     approximate_step_count = math.ceil(
         math.log(len(filtered_context_indices), 2))
