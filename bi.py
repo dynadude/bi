@@ -181,6 +181,7 @@ def get_filtered_context_indices(log: list[tuple[str, int]] | None = None) -> li
 
         match operation_type:
             case 'bad' | 'new':
+                # Only remove lines BEFORE new lines, not the new line itself
                 remove_before(filtered_context_indices, context_line_index)
             case 'good' | 'old':
                 remove_after(filtered_context_indices, context_line_index)
