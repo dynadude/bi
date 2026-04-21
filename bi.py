@@ -59,13 +59,11 @@ def start_command(script_args: list[str]) -> None:
 
 
 def status_command() -> None:
-    # TODO: notify and exit when there's only a bad/good line
     print_current_line_message()
 
 
 def mark_line_command(script_args: list[str]) -> None:
     operation = script_args[1]
-    # TODO: do not print status when there's only a bad/good line or there aren't any
     marked_line_index = None
     if len(script_args) > 2:
         marked_line_index = get_context_line_index(script_args[2])
@@ -174,7 +172,6 @@ def get_filtered_context_indices(log: list[tuple[str, int]] | None = None) -> li
                 remove_before(filtered_context_indices, context_line_index)
             case 'good' | 'old':
                 remove_after(filtered_context_indices, context_line_index)
-                # TODO: test without this
                 filtered_context_indices.pop(-1)
             case _:
                 pass
