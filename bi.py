@@ -77,7 +77,7 @@ def mark_line_command(script_args: list[str]) -> bool:
     verify_marked_lines_are_valid()
 
     print(
-        f"Line '{current_line}' of index {marked_line_index} has been marked as {operation}")
+        f"Line '{current_line}' has been marked as {operation}")
 
     print_current_line_message()
     return True
@@ -193,7 +193,7 @@ def verify_marked_lines_are_valid(log: list[tuple[str, int]] | None = None) -> N
         if context_line_index in existing_markings and not are_operation_types_equivalent(operation_type, existing_markings[context_line_index]):
             context_line = get_context_line(context_line_index)
             raise FileExistsError(
-                f"Line '{context_line}' of index {context_line_index} has been marked as both {existing_markings[context_line_index]} and {operation_type}")
+                f"Line '{context_line}' has been marked as both {existing_markings[context_line_index]} and {operation_type}")
 
         existing_markings[context_line_index] = operation_type
 
@@ -342,14 +342,14 @@ def print_current_line_message(filtered_context_indices: list[int] | None = None
         # The current line would not be marked by this point only if it was the first line in the context
         if operation_type == 'new' or operation_type == 'bad':
             print(
-                f"Line '{current_line}' of index {current_line_index} is the first bad/new line!")
+                f"Line '{current_line}' is the first bad/new line!")
             return
 
     approximate_step_count = math.ceil(
         math.log(len(filtered_context_indices), 2))
     print(f"{len(filtered_context_indices)} lines left to test after this (roughly {approximate_step_count} steps)")
     print(
-        f"Currently on line '{current_line}' of index {current_line_index}")
+        f"Currently on line '{current_line}'")
 
 
 def get_context_line_index(line: str) -> int:
