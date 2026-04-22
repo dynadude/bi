@@ -60,7 +60,11 @@ def start_command(script_args: list[str]) -> bool:
 
 
 def status_command() -> bool:
-    verify_marked_lines_are_valid()
+    try:
+        verify_marked_lines_are_valid()
+    except Exception as e:
+        print_error_message(e)
+        return False
 
     print_current_line_message()
     return True
@@ -68,27 +72,29 @@ def status_command() -> bool:
 
 def mark_line_command(script_args: list[str]) -> bool:
     operation = script_args[1]
+
+    # Pre-marking verification
+    try:
+        verify_marked_lines_are_valid()
+    except Exception as e:
+        print_error_message(e)
+        return False
+
     marked_line_index = None
     if len(script_args) > 2:
         marked_line_index = get_context_line_index(script_args[2])
     else:
-        try:
-            marked_line_index = get_current_line_index()
-        except FirstLineOldError:
-            print(
-                f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
-            return False
-        except AllFilteredLinesSkippedError as e:
-            print("There are only 'skip'ped lines left to test.")
-            print('The first bad/new line could be any of:')
-            print(
-                f"{os.linesep.join(map(lambda x: get_context_line(x), e.skipped_indices))}")
-            print('We cannot bisect more!')
-            return False
+        marked_line_index = get_current_line_index()
 
     current_line = get_context_line(marked_line_index)
     write_operation_to_log(operation, marked_line_index)
-    verify_marked_lines_are_valid()
+
+    # Post-marking verification
+    try:
+        verify_marked_lines_are_valid()
+    except Exception as e:
+        print_error_message(e)
+        return False
 
     print(
         f"Line '{current_line}' has been marked as {operation}")
@@ -122,18 +128,12 @@ def reset_command() -> bool:
 
 def visualize_command() -> bool:
     try:
-        filtered_context_indices = get_filtered_context_indices()
-    except FirstLineOldError:
-        print(
-            f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
+        verify_marked_lines_are_valid()
+    except Exception as e:
+        print_error_message(e)
         return False
-    except AllFilteredLinesSkippedError as e:
-        print("There are only 'skip'ped lines left to test.")
-        print('The first bad/new line could be any of:')
-        print(
-            f"{os.linesep.join(map(lambda x: get_context_line(x), e.skipped_indices))}")
-        print('We cannot bisect more!')
-        return False
+
+    filtered_context_indices = get_filtered_context_indices()
 
     context = get_context()
     current_line_index = get_current_line_index(filtered_context_indices)
@@ -157,7 +157,11 @@ def replay_command(script_args: list[str]) -> bool:
     supplied_log_file = script_args[2]
     raw_log = get_raw_log(supplied_log_file)
 
-    verify_marked_lines_are_valid(get_log(supplied_log_file))
+    try:
+        verify_marked_lines_are_valid(get_log(supplied_log_file))
+    except Exception as e:
+        print_error_message(e)
+        return False
 
     write_lines_to_file(LOG_FILE_PATH, raw_log)
 
