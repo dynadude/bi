@@ -38,6 +38,17 @@ class NoIndexInContextError(Exception):
         self.index = index
 
 
+class ConflictingOperationTypesError(Exception):
+    index: int
+    first_type: str
+    second_type: str
+
+    def __init__(self, index: int, first_type: str, second_type: str):
+        self.index = index
+        self.first_type = first_type
+        self.second_type = second_type
+
+
 def help_command() -> None:
     print(
         '''The bi python script performs a git-bisect-like operation on the contents of a text file, treating each line as a 'revision' to test.
