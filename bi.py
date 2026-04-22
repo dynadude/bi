@@ -78,6 +78,13 @@ def mark_line_command(script_args: list[str]) -> bool:
             print(
                 f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
             return False
+        except AllFilteredLinesSkippedError as e:
+            print("There are only 'skip'ped lines left to test.")
+            print('The first bad/new line could be any of:')
+            print(
+                f"{os.linesep.join(map(lambda x: get_context_line(x), e.skipped_indices))}")
+            print('We cannot bisect more!')
+            return False
 
     current_line = get_context_line(marked_line_index)
     write_operation_to_log(operation, marked_line_index)
@@ -119,6 +126,13 @@ def visualize_command() -> bool:
     except FirstLineOldError:
         print(
             f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
+        return False
+    except AllFilteredLinesSkippedError as e:
+        print("There are only 'skip'ped lines left to test.")
+        print('The first bad/new line could be any of:')
+        print(
+            f"{os.linesep.join(map(lambda x: get_context_line(x), e.skipped_indices))}")
+        print('We cannot bisect more!')
         return False
 
     context = get_context()
@@ -309,6 +323,42 @@ def get_filtered_context_indices(log: list[tuple[str, int]] | None = None) -> li
             case _:
                 pass
 
+    # Make list of skipped filtered indices
+    skipped_filtered_indices: list[int] = []
+    for operation in log:
+        operation_type = operation[0]
+        context_line_index = operation[1]
+
+        if operation_type == 'skip' and context_line_index in filtered_context_indices:
+            skipped_filtered_indices.append(context_line_index)
+
+    # This is kept for the Exception/error message
+    original_filtered_context_indices = list(filtered_context_indices)
+
+    for index in skipped_filtered_indices:
+        filtered_context_indices.remove(index)
+
+    if len(skipped_filtered_indices) > 0:
+        # This would only happen if the newest line (or lines) was/were skipped,
+        # and the line after that is marked as old
+        if len(filtered_context_indices) == 0:
+            raise AllFilteredLinesSkippedError(
+                original_filtered_context_indices)
+        # This would happen if the only non-skipped line is marked as new/bad
+        elif len(filtered_context_indices) == 1:
+            only_non_skipped_index = filtered_context_indices[0]
+            # If the first bad/new line we know of is followed by skip lines,
+            # we can't determine which line is the first bad/new one
+            if only_non_skipped_index == original_filtered_context_indices[0]:
+                match get_operation_type_at_index(only_non_skipped_index):
+                    case 'new' | 'bad':
+                        raise AllFilteredLinesSkippedError(
+                            original_filtered_context_indices)
+                    # The operation type can only be new/bad or None here,
+                    # old/good or skip would've been removed by this point
+                    case _:
+                        pass
+
     return filtered_context_indices
 
 
@@ -338,6 +388,13 @@ def print_current_line_message(filtered_context_indices: list[int] | None = None
         except FirstLineOldError:
             print(
                 f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
+            return
+        except AllFilteredLinesSkippedError as e:
+            print("There are only 'skip'ped lines left to test.")
+            print('The first bad/new line could be any of:')
+            print(
+                f"{os.linesep.join(map(lambda x: get_context_line(x), e.skipped_indices))}")
+            print('We cannot bisect more!')
             return
 
     current_line_index = get_current_line_index(
