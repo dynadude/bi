@@ -222,6 +222,20 @@ def verify_marked_lines_are_valid(log: list[tuple[str, int]] | None = None) -> N
     get_current_line_index(get_filtered_context_indices(log))
 
 
+def print_error_message(e: Exception) -> None:
+    if isinstance(e, FirstLineOldError):
+        print(
+            f"The first line was marked as {get_operation_type_at_index(0)}! There are no good/old lines")
+    elif isinstance(e, AllFilteredLinesSkippedError):
+        print("There are only 'skip'ped lines left to test.")
+        print('The first bad/new line could be any of:')
+        print(
+            f"{os.linesep.join(map(lambda x: get_context_line(x), e.skipped_indices))}")
+        print('We cannot bisect more!')
+    else:
+        raise e
+
+
 def are_operation_types_equivalent(first_type: str, second_type: str) -> bool:
     if first_type == second_type:
         return True
