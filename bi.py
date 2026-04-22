@@ -218,6 +218,9 @@ def verify_marked_lines_are_valid(log: list[tuple[str, int]] | None = None) -> N
 
         existing_markings[context_line_index] = operation_type
 
+    # get_filtered_context_indices() or get_current_line_index() could raise additional errors we want to test for
+    get_current_line_index(get_filtered_context_indices(log))
+
 
 def are_operation_types_equivalent(first_type: str, second_type: str) -> bool:
     if first_type == second_type:
