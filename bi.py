@@ -31,6 +31,13 @@ class AllFilteredLinesSkippedError(Exception):
         self.skipped_indices = skipped_indices
 
 
+class NoIndexInContextError(Exception):
+    index: int
+
+    def __init__(self, index: int):
+        self.index = index
+
+
 def help_command() -> None:
     print(
         '''The bi python script performs a git-bisect-like operation on the contents of a text file, treating each line as a 'revision' to test.
