@@ -24,6 +24,13 @@ class FirstLineOldError(Exception):
     pass
 
 
+class AllFilteredLinesSkippedError(Exception):
+    skipped_indices = []
+
+    def __init__(self, skipped_indices: list[int]):
+        self.skipped_indices = skipped_indices
+
+
 def help_command() -> None:
     print(
         '''The bi python script performs a git-bisect-like operation on the contents of a text file, treating each line as a 'revision' to test.
