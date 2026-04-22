@@ -254,6 +254,15 @@ def print_error_message(e: Exception) -> None:
         print(
             f"{os.linesep.join(map(lambda x: get_context_line(x), e.skipped_indices))}")
         print('We cannot bisect more!')
+    elif isinstance(e, ConflictingOperationTypesError):
+        print(
+            f"Line '{get_context_line(e.index)}' has been marked as both {e.first_type} and {e.second_type}!")
+    elif isinstance(e, InvalidOperationTypeError):
+        print(
+            f"Log contains operation of an invalid type '{e.operation_type}'!")
+    elif isinstance(e, NoIndexInContextError):
+        print(
+            f"Log contains operation on an index that is not in the context '{e.index}'!")
     else:
         raise e
 
