@@ -17,7 +17,10 @@ LOG_FILE_PATH = os.path.join(USER_BI_DIR, 'log')
 
 
 class InvalidOperationTypeError(Exception):
-    pass
+    operation_type: str
+
+    def __init__(self, operation_type: str):
+        self.operation_type = operation_type
 
 
 class FirstLineOldError(Exception):
@@ -224,19 +227,16 @@ def verify_marked_lines_are_valid(log: list[tuple[str, int]] | None = None) -> N
             case 'good' | 'old' | 'bad' | 'new' | 'skip':
                 pass
             case _:
-                raise InvalidOperationTypeError(
-                    f"Operation type '{operation_type}' is invalid")
+                raise InvalidOperationTypeError(operation_type)
 
         # Verify that all marked lines correspond to real lines in the context
         if context_line_index not in context_indices:
-            raise FileNotFoundError(
-                f"Context does not contain line of index {context_line_index}")
+            raise NoIndexInContextError(context_line_index)
 
         # Verify that there are no conflicting markings for the same line
         if context_line_index in existing_markings and not are_operation_types_equivalent(operation_type, existing_markings[context_line_index]):
-            context_line = get_context_line(context_line_index)
-            raise FileExistsError(
-                f"Line '{context_line}' has been marked as both {existing_markings[context_line_index]} and {operation_type}")
+            raise ConflictingOperationTypesError(
+                context_line_index, existing_markings[context_line_index], operation_type)
 
         existing_markings[context_line_index] = operation_type
 
