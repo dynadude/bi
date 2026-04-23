@@ -264,12 +264,10 @@ def mark_line_command(script_args: list[str]) -> bool:
 
 
 def reset_command() -> bool:
-    # Create the user bi dir if it does not exist, but abort if it exists but isn't a directory (most likely a regular file)
+    # Create the user bi dir if it does not exist, and delete it if it exists but isn't a directory (most likely a regular file)
     if not os.path.isdir(USER_BI_DIR):
         if os.path.exists(USER_BI_DIR):
-            print(
-                f"Path {USER_BI_DIR} exists but is not a directory. Please remove it manually. Aborting...")
-            return False
+            os.remove(USER_BI_DIR)
 
         os.mkdir(USER_BI_DIR)
 
