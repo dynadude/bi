@@ -271,16 +271,16 @@ def reset_command() -> bool:
 
         os.mkdir(USER_BI_DIR)
 
-    # Prompt the user to make sure they approve of overwriting the previous contents of their user bi dir if it isn't empty
+    # Prompt the user to make sure they approve of resetting the bisection state
     if not is_empty(USER_BI_DIR):
-        if does_user_consent(f"The {USER_BI_DIR} dir is not empty. are you sure you would like to recreate it? (y/N): "):
+        if does_user_consent('There is a currently-ongoing bisection. are you sure you would like to reset the bisection state? (y/N): '):
             recreate_dir(USER_BI_DIR)
         else:
             print(
-                f"Did not get user consent for recreating the {USER_BI_DIR} dir. Aborting...")
+                'Did not get user consent for resetting the bisection state. Aborting...')
             return False
 
-    print(f"Successfully recreated {USER_BI_DIR}")
+    print('Successfully reset the bisection state')
     return True
 
 
