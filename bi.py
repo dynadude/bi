@@ -496,6 +496,7 @@ def main() -> None:
     # the first value in the list is the script itself
     if len(script_args) <= 1:
         help_command()
+        return
 
     operation = script_args[1]
     match operation:
