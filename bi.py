@@ -199,6 +199,10 @@ EXAMPLES
 
 
 def start_command(script_args: list[str]) -> bool:
+    if len(script_args) <= 2:
+        print('No context file was specified for the start command. Aborting...')
+        return False
+
     original_context_file = script_args[2]
     # remove empty lines
     context = get_context(original_context_file)
@@ -312,6 +316,10 @@ def visualize_command() -> bool:
 
 
 def replay_command(script_args: list[str]) -> bool:
+    if len(script_args) <= 2:
+        print('No log file was specified for the replay command. Aborting...')
+        return False
+
     supplied_log_file = script_args[2]
     raw_log = get_raw_log(supplied_log_file)
 
