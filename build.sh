@@ -11,6 +11,8 @@ CONTAINER_NAME="${IMAGE_NAME}"
 function cleanup() (
     SCRIPT_STATUS=$?
 
+    set +o errexit # do NOT abort on nonzero exitstatus
+
     echo 'Cleaning up docker image and container...'
     docker image rm "${IMAGE_NAME}" &>/dev/null
     docker kill "${CONTAINER_NAME}" &>/dev/null
